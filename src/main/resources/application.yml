@@ -1,0 +1,6 @@
+spring:
+  data:
+    mongodb:
+      username: root
+      password: rootpassword
+      uri: mongodb://localhost:27017/lightning-recipes
