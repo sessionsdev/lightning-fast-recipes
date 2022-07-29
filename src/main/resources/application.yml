@@ -2,5 +2,8 @@ spring:
   data:
     mongodb:
       username: root
-      password: rootpassword
-      uri: mongodb://localhost:27017/lightning-recipes
+      password: password
+      host: mongodb_container
+      port: 27017
+      database: lightning_recipes
+      authentication-database: admin

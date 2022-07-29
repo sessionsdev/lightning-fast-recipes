@@ -10,16 +10,50 @@ services:
     ports:
       - "8090:8080"
     hostname: localhost
+    depends_on:
+      - mongodb_container
+    networks:
+      - backend
 
   mongodb_container:
     image: mongo:latest
+    restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: lightning_recipes
     ports:
       - "27017:27017"
     volumes:
-      - mongodb_data_container:/data/db
+      - ./docker/database/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - mongodb-data:/data/db
+    networks:
+      - backend
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb_container
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: password
+    volumes:
+      - mongodb-data:/data/db
+    depends_on:
+      - mongodb_container
+    networks:
+      - backend
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
 
 volumes:
-  mongodb_data_container:
+  mongodb-data:
+    name: mongodb-data
+
+networks:
+  backend:
+    name: backend
